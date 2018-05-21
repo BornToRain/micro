@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+// Brought in from scalapb-runtime
+import "scalapb/scalapb.proto";
+import "google/protobuf/wrappers.proto";
+
+package org.ryze.micro.demo.domain;
+
+message Created
+{
+  option (scalapb.message).extends = "org.ryze.micro.demo.protocol.DemoEvent";
+  string id   = 1;
+  string name = 2;
+}
+
+message Updated
+{
+  option (scalapb.message).extends = "org.ryze.micro.demo.protocol.DemoEvent";
+  string id   = 1;
+  string name = 2;
+}
+
+message Deleted
+{
+  option (scalapb.message).extends = "org.ryze.micro.demo.protocol.DemoEvent";
+  string id   = 1;
+}

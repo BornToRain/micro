@@ -1,9 +1,6 @@
 package org.ryze.micro.protocol.domain
 
-/**
-  * 领域命令
-  */
-trait Command
+trait DomainCommand
 {
   val id: String
 }

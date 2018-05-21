@@ -6,13 +6,21 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.cluster.client.ClusterClientReceptionist
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings}
 import akka.cluster.sharding.ShardRegion.HashCodeMessageExtractor
-import org.ryze.micro.protocol.domain.Command
+import org.ryze.micro.protocol.domain.DomainCommand
 
 /**
   * 集群工厂
   */
-abstract class ClusterFactory(cc: ClusterConfiguration)(implicit system: ActorSystem)
+abstract class ClusterFactory(maxShard: Int)(implicit system: ActorSystem)
 {
+  //Hash分片
+  private[micro] val messageExtractor = new HashCodeMessageExtractor(maxShard)
+  {
+    override def entityId(message: Any) = message match
+    {
+      case c: DomainCommand => c.id
+    }
+  }
   //创建分片
   def createShard(name: String)(props: Props): ActorRef
   //创建代理
@@ -37,18 +45,18 @@ abstract class ClusterFactory(cc: ClusterConfiguration)(implicit system: ActorSy
   def registerClientReceptionist(name: String): Unit = ClusterClientReceptionist(system) registerService get(name).get
 }
 
-class DefaultClusterFactory(cc: ClusterConfiguration)(implicit system: ActorSystem) extends ClusterFactory(cc)
+class DefaultClusterFactory(maxShard: Int)(implicit system: ActorSystem) extends ClusterFactory(maxShard)
 {
   override def createShard(name: String)(props: Props) = ClusterSharding(system) start(
     typeName         = name,
     entityProps      = props,
     settings         = ClusterShardingSettings(system).withRole(name),
-    messageExtractor = cc.messageExtractor
+    messageExtractor = messageExtractor
   )
   override def createProxy(name: String)               = ClusterSharding(system) startProxy(
     typeName = name,
     role = Optional.of(name),
-    messageExtractor = cc.messageExtractor
+    messageExtractor = messageExtractor
   )
   override def get(name: String) = try
   {
@@ -57,17 +65,5 @@ class DefaultClusterFactory(cc: ClusterConfiguration)(implicit system: ActorSyst
   catch
   {
     case _: Exception => None
-  }
-}
-
-case class ClusterConfiguration(maxShard: Int)
-{
-  //Hash分片
-  lazy val messageExtractor = new HashCodeMessageExtractor(maxShard)
-  {
-    override def entityId(message: Any) = message match
-    {
-      case c: Command => c.id
-    }
   }
 }

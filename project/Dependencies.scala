@@ -1,12 +1,12 @@
 import sbt._
-import sbt.Keys._
 
 object Version
 {
-  val akka  = "2.5.12"
-  val http  = "10.1.1"
-  val circe = "0.9.3"
-  val cats  = "1.1.0"
+  val akka    = "2.5.12"
+  val http    = "10.1.1"
+  val circe   = "0.9.3"
+  val cats    = "1.1.0"
+  val rxmongo = "0.12.6"
 }
 
 object Dependencies
@@ -25,6 +25,7 @@ object Dependencies
     //持久化
     lazy val persistence        = apply("persistence")
     lazy val persistenceQuery   = apply("persistence-query")
+    lazy val persistenceRxMongo = "com.github.scullxbones" %% "akka-persistence-mongo-rxmongo" % "2.0.10"
 
     @inline
     private[this] def apply(name: String, version: String = Version.akka) = "com.typesafe.akka" %% s"akka-$name" % version
@@ -48,15 +49,18 @@ object Dependencies
     private[this] def apply(name: String) = "org.typelevel" %% s"cats-$name" % Version.cats
   }
 
+  object rxmongo
+  {
+    lazy val rxmongo = apply("reactivemongo")
+    lazy val rxmongoStream = apply("reactivemongo-akkastream")
+
+    @inline
+    private [this] def apply(name: String) = "org.reactivemongo" %% name % Version.rxmongo
+  }
+
   object other
   {
     lazy val logback  = "ch.qos.logback"       % "logback-classic"  % "1.2.3"
     lazy val protobuf = "com.thesamet.scalapb" %% "scalapb-runtime" % scalapb.compiler.Version.scalapbVersion % "protobuf"
   }
-
-  def module(id: String) = Project(id, file(id))
-  .settings(
-    name       := id,
-    moduleName := id
-  )
 }

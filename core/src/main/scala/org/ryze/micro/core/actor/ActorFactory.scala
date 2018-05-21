@@ -1,23 +1,18 @@
 package org.ryze.micro.core.actor
 
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props}
+import com.typesafe.config.Config
+
 
 /**
-  * 普通Actor工厂
+  * Akka工厂
   */
-trait ActorFactory
+case class ActorFactory(config: Config)
 {
-  def get(name: String): Option[ActorRef]
-  def create(props: Props)(name: String): ActorRef
-  def getOrCreate(props: Props)(name: String) = get(name) getOrElse create(props)(name)
-}
+  implicit val system  = ActorSystem(config.getString("akka.cluster.name"), config)
+  //Actor运行环境隐式量
+  implicit val runtime = ActorRuntime()
 
-/**
-  * Actor监管
-  */
-trait ActorSupervisor extends ActorFactory
-{
-  this: Actor with ActorLogging =>
-  override def get(name: String) = context child name
-  override def create(props: Props)(name: String) = context actorOf(props, name)
+  //创建Actor
+  def create(props: Props)(name: String) = system actorOf(props, name)
 }

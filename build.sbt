@@ -6,22 +6,21 @@ scalaVersion  in ThisBuild := "2.12.6"
 organization  in ThisBuild := "org.ryze.micro"
 scalacOptions in ThisBuild := Seq(
   "-encoding", "UTF-8",
-  "-source"  , "1.8",
-  "-target"  , "1.8",
   "-Ypartial-unification"
 )
 
+/*******************框架*******************/
 //核心组件
-lazy val `core`         = module("core")
+lazy val `core`         = (project in file("core"))
 .settings(
   libraryDependencies ++= Seq(
-    akka.actor,
-    akka.clusterShard
+    akka.actor, akka.slf4j,
+    akka.clusterShard, akka.clusterMetrics
   )
 )
 .dependsOn(`protocol`)
 //http组件
-lazy val `http-support` = module("http-support")
+lazy val `http-support` = (project in file("http-support"))
 .settings(
   libraryDependencies ++= Seq(
     akka.http, akka.stream,
@@ -29,9 +28,12 @@ lazy val `http-support` = module("http-support")
   )
 )
 //协议
-lazy val `protocol`     = module("protocol")
+lazy val `protocol`     = (project in file("protocol"))
 .settings(
   libraryDependencies ++= Seq(
     akka.clusterShard
   )
 )
+/*******************框架*******************/
+
+lazy val `demo`         = project in file("demo")
