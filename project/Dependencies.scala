@@ -22,6 +22,7 @@ object Dependencies
     lazy val cluster            = apply("cluster")
     lazy val clusterShard       = apply("cluster-sharding")
     lazy val clusterMetrics     = apply("cluster-metrics")
+    lazy val clusterTools       = apply("cluster-tools")
     //持久化
     lazy val persistence        = apply("persistence")
     lazy val persistenceQuery   = apply("persistence-query")

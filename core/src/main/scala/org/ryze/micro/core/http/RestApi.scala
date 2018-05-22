@@ -1,4 +1,4 @@
-package org.ryze.micro.http
+package org.ryze.micro.core.http
 
 import akka.http.scaladsl.server.{Directives, Route}
 

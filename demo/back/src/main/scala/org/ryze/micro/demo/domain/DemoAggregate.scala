@@ -11,17 +11,17 @@ class DemoAggregate extends AggregateRoot[Option[Demo], DemoCommand, DemoEvent]
 
   override def updateState(event: DemoEvent): Unit = event match
   {
-    case e: Created => state = Some(Demo(e.id, e.name))
     case e: Updated => state = state map (_ copy (name = e.name))
+    case e: Created => state = Some(Demo(e.id, e.name))
     case _: Deleted => state = None
   }
   override def receiveCommand                      =
   {
-    case c: Create => persist(Created(c.id, c.name))(afterPersist)
-    case c: Update => persist(Updated(c.id, c.name))(afterPersist)
-    case c: Delete => persist(Deleted(c.id))(afterPersist)
+    case c: Update => persist(c.event)(afterPersist)
+    case c: Create => persist(c.event)(afterPersist)
+    case c: Delete => persist(c.event)(afterPersist)
   }
-  override def persistenceId                       = self.path.name
+  override def persistenceId                       = DemoAggregate.NAME
 }
 
 object DemoAggregate

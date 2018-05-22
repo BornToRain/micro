@@ -22,4 +22,4 @@ lazy val `demo-back`     = (project in file("back"))
     other.logback
   )
 )
-.dependsOn(`demo-protocol`, LocalProject("core"), LocalProject("http-support"))
+.dependsOn(`demo-protocol`, LocalProject("core"))

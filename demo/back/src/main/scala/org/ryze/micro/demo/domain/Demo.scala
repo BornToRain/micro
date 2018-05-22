@@ -1,6 +1,6 @@
 package org.ryze.micro.demo.domain
 
-case class Demo(id: String, name: String)
+case class Demo(_id: String, name: String)
 
 object Demo
 {

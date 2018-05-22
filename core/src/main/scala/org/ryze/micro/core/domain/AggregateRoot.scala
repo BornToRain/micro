@@ -1,6 +1,8 @@
 package org.ryze.micro.core.domain
 
 import akka.actor.ActorLogging
+import akka.cluster.pubsub.DistributedPubSub
+import akka.cluster.pubsub.DistributedPubSubMediator.Publish
 import akka.persistence.{PersistentActor, SnapshotOffer}
 import org.ryze.micro.protocol.domain.{DomainCommand, DomainEvent}
 
@@ -15,9 +17,11 @@ abstract class AggregateRoot[State: ClassTag, Command <: DomainCommand: ClassTag
   private[this] var eventCount = 0
 
   private[this] def reply: Unit = sender ! state
-  private[this] def publish(event: Event) = context.system.eventStream publish event
+  private[this] def publish(event: Event) = mediator ! Publish(persistenceId, event, sendOneMessageToEachGroup = true)
 
   var state: State
+  //分布式订阅
+  val mediator = DistributedPubSub(context.system).mediator
 
   def updateState(event: Event) : Unit
   /**

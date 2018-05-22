@@ -15,18 +15,12 @@ lazy val `core`         = (project in file("core"))
 .settings(
   libraryDependencies ++= Seq(
     akka.actor, akka.slf4j,
-    akka.clusterShard, akka.clusterMetrics
+    akka.http, akka.stream,
+    circe.parser, circe.genericExtras,
+    akka.clusterShard, akka.clusterMetrics, akka.clusterTools
   )
 )
 .dependsOn(`protocol`)
-//http组件
-lazy val `http-support` = (project in file("http-support"))
-.settings(
-  libraryDependencies ++= Seq(
-    akka.http, akka.stream,
-    circe.parser, circe.genericExtras
-  )
-)
 //协议
 lazy val `protocol`     = (project in file("protocol"))
 .settings(

@@ -4,17 +4,17 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern._
 import akka.util.Timeout
 import cats.data.OptionT
+import cats.implicits._
 import org.ryze.micro.core.tool.IdWorker
 import org.ryze.micro.demo.application.service.DemoService.Request
-import org.ryze.micro.demo.domain.{Demo, DemoRepository}
+import org.ryze.micro.demo.domain.Demo
 import org.ryze.micro.demo.interfaces.dto.DemoDTO
-import org.ryze.micro.demo.protocol.{Create, Delete, Update}
+import org.ryze.micro.demo.protocol.{Create, Delete, GetState, Update}
 
 import scala.concurrent.ExecutionContext
 import scala.language.postfixOps
-import cats.implicits._
 
-class DemoService(domain: ActorRef, repository: DemoRepository)(implicit timeout: Timeout, ec: ExecutionContext) extends Actor with ActorLogging
+class DemoService(domain: ActorRef, read: ActorRef)(implicit timeout: Timeout, ec: ExecutionContext) extends Actor with ActorLogging
 {
   private[this] def create(r: Request.Create) =
   {
@@ -24,7 +24,7 @@ class DemoService(domain: ActorRef, repository: DemoRepository)(implicit timeout
   }
   private[this] def update(r: Update) = OptionT((domain ? r).mapTo[Option[Demo]]) map (d => DemoDTO(d.name)) value
   private[this] def delete(r: Delete) = OptionT((domain ? r).mapTo[Option[Demo]]) map (_ => true) getOrElse false
-  private[this] def get(id: String)   = OptionT(repository.selectOne(id)) map (d => DemoDTO(d.name)) value
+  private[this] def get(id: String)   = OptionT((read ? GetState(id)).mapTo[Option[Demo]]) map (d => DemoDTO(d.name)) value
 
   override def receive =
   {
@@ -39,8 +39,8 @@ object DemoService
 {
   final val NAME = "demo-service"
 
-  def props(domain: ActorRef, repository: DemoRepository)(implicit timeout: Timeout, ec: ExecutionContext) =
-    Props(new DemoService(domain, repository))
+  def props(domain: ActorRef, read: ActorRef)(implicit timeout: Timeout, ec: ExecutionContext) =
+    Props(new DemoService(domain, read))
 
   sealed trait Request
   object Request

@@ -1,4 +1,4 @@
-package org.ryze.micro.http
+package org.ryze.micro.core.http
 
 import akka.http.scaladsl.marshalling.{Marshaller, ToEntityMarshaller}
 import akka.http.scaladsl.model.{ContentType, ContentTypeRange, HttpEntity}

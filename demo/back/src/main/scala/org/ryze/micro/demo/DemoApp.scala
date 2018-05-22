@@ -1,18 +1,15 @@
 package org.ryze.micro.demo
 
-import akka.actor.{Actor, ActorContext, ActorLogging, Props, Terminated}
+import akka.actor.{Actor, ActorLogging, Props, Terminated}
 import akka.contrib.persistence.mongodb.MongoReadJournal
 import akka.persistence.query.PersistenceQuery
 import akka.persistence.query.scaladsl.EventsByTagQuery
-import com.typesafe.config.{ConfigFactory, ConfigValueFactory}
+import com.typesafe.config.ConfigFactory
 import org.ryze.micro.core.actor.{ActorFactory, ActorSupervisor}
 import org.ryze.micro.demo.application.service.DemoService
-import org.ryze.micro.demo.domain.{DemoAggregate, DemoReadSideProcessor}
+import org.ryze.micro.demo.domain.{DemoAggregate, DemoReadSide}
 import org.ryze.micro.demo.infrastructure.{DemoRepositoryImpl, MongoDBClient}
 import org.ryze.micro.demo.interfaces.api.v1.DemoApi
-import org.ryze.micro.demo.DemoStartUp.factory
-
-import scala.concurrent.Future
 
 object DemoStartUp extends App
 {
@@ -28,12 +25,14 @@ class DemoApp(implicit factory: ActorFactory) extends Actor with ActorLogging wi
   import factory.runtime._
 
   private[this] val readJournal = PersistenceQuery(factory.system).readJournalFor[EventsByTagQuery](MongoReadJournal.Identifier)
-  private[this] val mongodb    = MongoDBClient(factory.config)
-  private[this] val repository = DemoRepositoryImpl(mongodb.db)
-  private[this] val domain     = context actorOf(DemoAggregate.props, DemoAggregate.NAME)
-  private[this] val read       = context actorOf(DemoReadSideProcessor.props(readJournal, repository), DemoReadSideProcessor.NAME)
-  private[this] val service    = context actorOf(DemoService.props(domain, repository), DemoService.NAME)
-  private[this] val api        = context actorOf(DemoApi.props(service), DemoApi.NAME)
+  private[this] val mongodb     = MongoDBClient(factory.config)
+  private[this] val repository  = DemoRepositoryImpl(mongodb.db)
+  private[this] val domain      = factory.cluster.shard(DemoAggregate.NAME)(DemoAggregate.props)
+//    create(DemoAggregate.props)(DemoAggregate.NAME)
+  private[this] val read        = factory.cluster.shard(DemoReadSide.NAME)(DemoReadSide.props(readJournal, repository))
+//    create(DemoReadSide.props(readJournal, repository))(DemoReadSide.NAME)
+  private[this] val service     = create(DemoService.props(domain, read))(DemoService.NAME)
+  private[this] val api         = create(DemoApi.props(service))(DemoApi.NAME)
 
   context watch domain
   context watch read
