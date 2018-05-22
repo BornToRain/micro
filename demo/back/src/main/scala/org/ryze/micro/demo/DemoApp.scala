@@ -22,6 +22,7 @@ object DemoStartUp extends App
 
 class DemoApp(implicit factory: ActorFactory) extends Actor with ActorLogging with ActorSupervisor
 {
+  import factory.runtime
   import factory.runtime._
 
   private[this] val readJournal = PersistenceQuery(factory.system).readJournalFor[EventsByTagQuery](MongoReadJournal.Identifier)
