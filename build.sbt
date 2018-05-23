@@ -31,3 +31,6 @@ lazy val `protocol`     = (project in file("protocol"))
 /*******************框架*******************/
 
 lazy val `demo`         = project in file("demo")
+
+//金管家
+lazy val `pa`           = project in file("pa")

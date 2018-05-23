@@ -58,7 +58,7 @@ class DefaultClusterFactory(maxShard: Int)(implicit system: ActorSystem) extends
     role = Optional.of(name),
     messageExtractor = messageExtractor
   )
-  override def get(name: String) = try
+  override def get(name: String)                       = try
   {
     Some(ClusterSharding(system) shardRegion name)
   }
