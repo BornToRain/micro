@@ -10,7 +10,7 @@ object PAStartUp extends App with ConfigLoader
 {
   implicit val factory = ActorFactory(loader)
 
-  factory create(PAApp.props)(PAApp.NAME)
+  factory.create(PAApp.props)(PAApp.NAME)
 }
 
 /**

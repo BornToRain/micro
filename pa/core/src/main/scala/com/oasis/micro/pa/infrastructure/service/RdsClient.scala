@@ -9,6 +9,8 @@ import redis.RedisClient
   */
 case class RdsClient(config: Config)(implicit runtime: ActorRuntime)
 {
+  import runtime._
+
   private[this] val redisConfig = config.getConfig("redis")
 
   lazy val host = redisConfig.getString("host")

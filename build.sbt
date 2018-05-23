@@ -8,6 +8,7 @@ scalacOptions in ThisBuild := Seq(
   "-encoding", "UTF-8",
   "-Ypartial-unification"
 )
+unmanagedBase              := baseDirectory.value / "libs"
 
 /*******************框架*******************/
 //核心组件

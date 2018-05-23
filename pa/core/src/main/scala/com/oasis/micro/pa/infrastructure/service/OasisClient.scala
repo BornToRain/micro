@@ -16,6 +16,8 @@ import scala.concurrent.Future
   */
 case class OasisClient(implicit runtime: ActorRuntime) extends JsonSupport
 {
+  import runtime._
+
   private[this] def post(uri: String)(entity: Future[RequestEntity]) = for
   {
     request  <- entity
