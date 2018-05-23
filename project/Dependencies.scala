@@ -61,7 +61,12 @@ object Dependencies
 
   object other
   {
-    lazy val logback  = "ch.qos.logback"       % "logback-classic"  % "1.2.3"
+    //日志
+    lazy val logback  = "ch.qos.logback"       %  "logback-classic" % "1.2.3"
+    //Protobuf序列化
     lazy val protobuf = "com.thesamet.scalapb" %% "scalapb-runtime" % scalapb.compiler.Version.scalapbVersion % "protobuf"
+    //Redis
+    lazy val redis    = "com.github.etaty"     %% "rediscala"       % "1.8.0"
+    lazy val jodaTime = "joda-time"            %  "joda-time"       % "2.9.9"
   }
 }

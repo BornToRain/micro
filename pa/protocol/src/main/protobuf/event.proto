@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+import "scalapb/scalapb.proto";
+import "google/protobuf/wrappers.proto";
+//import "pa/protocol/src/main/protobuf/vo.proto";
+
+package com.oasis.micro.pa.domain;
+
+message Paid
+{
+  option (scalapb.message).extends = "com.oasis.micro.pa.protocol.PAEvent";
+  string               id        = 1;
+  string               orderId   = 2;
+  string               openID    = 3;
+  int32                amount    = 4;
+  string               payType   = 5;
+  repeated OrderDetail details   = 6;
+  string               detailUri = 7;
+}
+
+//订单详情
+message OrderDetail
+{
+  option (scalapb.message).extends = "com.oasis.micro.pa.protocol.PAValueObject";
+  string id       = 1;
+  string name     = 2;
+  int32  count    = 3;
+  string uri      = 4;
+  string imageUri = 5;
+  string subject  = 6;
+  int32  amount   = 7;
+}
