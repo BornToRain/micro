@@ -20,10 +20,10 @@ class PAApp(implicit factory: ActorFactory) extends Actor with ActorLogging with
 {
   import factory.runtime
 
-  private[this] val redis = RdsClient(factory.config).rds
+  private[this] val redis  = RdsClient(factory.config).rds
   private[this] val client = PAClient(redis)
   private[this] val oasis  = OasisClient()
-  private[this] val api   = create(PAApi.props(client, oasis))(PAApi.NAME)
+  private[this] val api    = create(PAApi.props(client, oasis))(PAApi.NAME)
 
   context watch api
 
